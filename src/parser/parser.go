@@ -26,13 +26,6 @@ type ASTNode struct {
 	left     *ASTNode
 	right    *ASTNode
 }
-
-type Parser interface {
-	Parse(p string) *ASTNode
-	BinaryExpression() *ASTNode
-	NumericLiteral() *ASTNode
-}
-
 type StringParser struct {
 	state     string
 	tokenizer *tokenizer.Tokenizer
@@ -46,6 +39,9 @@ func NewStringParser() *StringParser {
 	return sp
 }
 
+/* Parse accepts a string and returns the abstract syntax tree
+representation of the string.  Assumes that all tokenizable bytes
+are separated by a space. */
 func (sp *StringParser) Parse(p string) *ASTree {
 	sp.state = p
 	sp.tokenizer = &tokenizer.Tokenizer{Stack: strings.Fields(p), Cursor: 0}
@@ -53,12 +49,17 @@ func (sp *StringParser) Parse(p string) *ASTree {
 	return &ASTree{Type: "AbstractSyntaxTree", Body: *sp.BinaryExpression()}
 }
 
+/*
+BinaryExpression
+	: PrimaryExpression
+	| PrimaryExpression ADDITIVE_OPERATOR PrimaryExpression
+	;
+*/
 func (sp *StringParser) BinaryExpression() *ASTNode {
 	left := sp.PrimaryExpression()
 	for sp.lookAhead != nil && sp.lookAhead.Type == "ADDITIVE_OPERATOR" {
 		operator := sp.eat("ADDITIVE_OPERATOR")
 		right := sp.PrimaryExpression()
-
 		left = &ASTNode{
 			Type:     BinaryExpression,
 			Operator: operator.Value.(string),
@@ -69,6 +70,24 @@ func (sp *StringParser) BinaryExpression() *ASTNode {
 	return left
 }
 
+/*
+ParenthesizedExpression
+	: "(" BinaryExpression ")"
+	;
+*/
+func (sp *StringParser) ParenthesizedExpression() *ASTNode {
+	sp.eat("OPEN_PAREN")
+	expression := sp.BinaryExpression()
+	sp.eat("CLOSE_PAREN")
+	return expression
+}
+
+/*
+PrimaryExpression
+	: NumericLiteral
+	| ParenthesizedExpression
+	;
+*/
 func (sp *StringParser) PrimaryExpression() *ASTNode {
 	switch sp.lookAhead.Type {
 	case "OPEN_PAREN":
@@ -78,6 +97,11 @@ func (sp *StringParser) PrimaryExpression() *ASTNode {
 	}
 }
 
+/*
+NumericLiteral
+	: NUMBER
+	;
+*/
 func (sp *StringParser) NumericLiteral() *ASTNode {
 	token := sp.eat("NUMBER")
 	if value, err := strconv.Atoi(token.Value.(string)); err == nil {
@@ -90,13 +114,10 @@ func (sp *StringParser) NumericLiteral() *ASTNode {
 
 }
 
-func (sp *StringParser) ParenthesizedExpression() *ASTNode {
-	sp.eat("OPEN_PAREN")
-	expression := sp.BinaryExpression()
-	sp.eat("CLOSE_PAREN")
-	return expression
-}
-
+/*
+eat is a helper function that validates the token from the tokenizer
+and steps the parser forward
+*/
 func (sp *StringParser) eat(tokenType string) *tokenizer.Token {
 	token := sp.lookAhead
 	if token == nil {
@@ -109,6 +130,7 @@ func (sp *StringParser) eat(tokenType string) *tokenizer.Token {
 	return token
 }
 
+/* Evaluate returns the evaluated expression of the AST */
 func (n *ASTNode) Evaluate() int {
 	if n.Type == NumericLiteral {
 		return n.Value.(int)
