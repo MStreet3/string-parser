@@ -25,3 +25,6 @@ var specification = []TokenSpecification{
 	{regex: `^\)`, name: "CLOSE_PAREN"},
 }
 ```
+
+content in this repo is inspired and guided by the (Parser from Scratch)[http://dmitrysoshnikov.com/courses/parser-from-scratch/]
+course in JavaScript.
