@@ -5,21 +5,23 @@ the value of the expression as an integer.
 
 develops a manual `recursive descent parser`.
 
-### abstract syntax trees
+to execute the tests
 
-a json object with a `type`, `operator`, `left` and `right`.
+```bash
+$ cd recursiveDescentParser
+$ cd ./src/parser
+$ go run parser.go
+```
 
-```json
-{
-  "type": "BinaryExpression",
-  "operator": "+",
-  "left": {
-    "type": "NumericalLiteral",
-    "value": 3
-  },
-  "right": {
-    "type": "NumericalLiteral",
-    "value": 4
-  }
+this `tokenizer` is rather basic and expects that all tokenizable `bytes` are
+separated by white space. the specification is also limited.
+
+```go
+/* tokenizer specification */
+var specification = []TokenSpecification{
+	{regex: `^\d+`, name: "NUMBER"},
+	{regex: `^[+\-]`, name: "ADDITIVE_OPERATOR"},
+	{regex: `^\(`, name: "OPEN_PAREN"},
+	{regex: `^\)`, name: "CLOSE_PAREN"},
 }
 ```
