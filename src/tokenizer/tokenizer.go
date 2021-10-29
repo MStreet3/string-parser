@@ -9,7 +9,13 @@ type TokenSpecification struct {
 	name  string
 }
 
-var specification = []TokenSpecification{{regex: `^\d+`, name: "NUMBER"}, {regex: `^[+\-]`, name: "ADDITIVE_OPERATOR"}}
+/* tokenizer specification */
+var specification = []TokenSpecification{
+	{regex: `^\d+`, name: "NUMBER"},
+	{regex: `^[+\-]`, name: "ADDITIVE_OPERATOR"},
+	{regex: `^\(`, name: "OPEN_PAREN"},
+	{regex: `^\)`, name: "CLOSE_PAREN"},
+}
 
 type Tokenizer struct {
 	Stack  []string

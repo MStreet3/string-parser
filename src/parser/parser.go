@@ -54,10 +54,10 @@ func (sp *StringParser) Parse(p string) *ASTree {
 }
 
 func (sp *StringParser) BinaryExpression() *ASTNode {
-	left := sp.NumericLiteral()
+	left := sp.PrimaryExpression()
 	for sp.lookAhead != nil && sp.lookAhead.Type == "ADDITIVE_OPERATOR" {
 		operator := sp.eat("ADDITIVE_OPERATOR")
-		right := sp.NumericLiteral()
+		right := sp.PrimaryExpression()
 
 		left = &ASTNode{
 			Type:     BinaryExpression,
@@ -67,6 +67,15 @@ func (sp *StringParser) BinaryExpression() *ASTNode {
 		}
 	}
 	return left
+}
+
+func (sp *StringParser) PrimaryExpression() *ASTNode {
+	switch sp.lookAhead.Type {
+	case "OPEN_PAREN":
+		return sp.ParenthesizedExpression()
+	default:
+		return sp.NumericLiteral()
+	}
 }
 
 func (sp *StringParser) NumericLiteral() *ASTNode {
@@ -79,6 +88,13 @@ func (sp *StringParser) NumericLiteral() *ASTNode {
 	}
 	return nil
 
+}
+
+func (sp *StringParser) ParenthesizedExpression() *ASTNode {
+	sp.eat("OPEN_PAREN")
+	expression := sp.BinaryExpression()
+	sp.eat("CLOSE_PAREN")
+	return expression
 }
 
 func (sp *StringParser) eat(tokenType string) *tokenizer.Token {
@@ -104,16 +120,34 @@ func (n *ASTNode) Evaluate() int {
 }
 
 func main() {
-	fmt.Println("IN MAIN")
+	cases := []string{
+		"1 + 2",
+		"( 1 )",
+		"( 1 - 2 ) + ( 3 + 3 )",
+		"0",
+		"( ( 1 - 5 ) + 4 ) + ( 4 - 1 )",
+		"( ( 1 - 5 ) + ( 4 + ( 3 ) ) ) + ( 4 - ( ( 1 ) ) )",
+	}
+	expected := []int{
+		3,
+		1,
+		5,
+		0,
+		3,
+		6,
+	}
 	p := NewStringParser()
-	/* firstTree := p.Parse("42 + 13")
-	fmt.Println(*firstTree.Body.left)
-	fmt.Println(firstTree.Body.Operator)
-	fmt.Println(*firstTree.Body.right) */
-	secondTree := p.Parse("42 + 13 - 1")
-	fmt.Println(*secondTree.Body.left)
-	fmt.Println(secondTree.Body.Operator)
-	fmt.Println(*secondTree.Body.right)
-	fmt.Println(secondTree.Body.Evaluate())
+	passed := true
+	for i, test := range cases {
+		result := p.Parse(test).Body.Evaluate()
+		if result != expected[i] {
+			fmt.Printf("failed case %d: %s\n", i, test)
+			passed = false
+		}
+
+	}
+	if passed {
+		fmt.Println("all test cases passed!")
+	}
 
 }
