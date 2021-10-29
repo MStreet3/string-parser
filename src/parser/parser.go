@@ -17,7 +17,7 @@ const (
 
 type ASTree struct {
 	Type string
-	Body ASTNode
+	Root ASTNode
 }
 type ASTNode struct {
 	Type     GrammarProduction
@@ -46,7 +46,7 @@ func (sp *StringParser) Parse(p string) *ASTree {
 	sp.state = p
 	sp.tokenizer = &tokenizer.Tokenizer{Stack: strings.Fields(p), Cursor: 0}
 	sp.lookAhead = sp.tokenizer.GetNextToken()
-	return &ASTree{Type: "AbstractSyntaxTree", Body: *sp.BinaryExpression()}
+	return &ASTree{Type: "AbstractSyntaxTree", Root: *sp.BinaryExpression()}
 }
 
 /*
@@ -148,7 +148,8 @@ and also parentheses to indicate order of operations.
 */
 func Calculate(expr string) int {
 	sp := NewStringParser()
-	return sp.Parse(expr).Body.Evaluate()
+	ast := sp.Parse(expr)
+	return ast.Root.Evaluate()
 }
 
 func main() {
