@@ -141,6 +141,16 @@ func (n *ASTNode) Evaluate() int {
 	}
 }
 
+/*
+Calculate accepts a string of addition / subtraction operations
+and also parentheses to indicate order of operations.
+- assumes all string characters are separated by white space
+*/
+func Calculate(expr string) int {
+	sp := NewStringParser()
+	return sp.Parse(expr).Body.Evaluate()
+}
+
 func main() {
 	cases := []string{
 		"1 - 2 + 3",
@@ -162,10 +172,10 @@ func main() {
 		3,
 		6,
 	}
-	p := NewStringParser()
+
 	passed := true
 	for i, test := range cases {
-		result := p.Parse(test).Body.Evaluate()
+		result := Calculate(test)
 		if result != expected[i] {
 			fmt.Printf("failed case %d: %s\n", i, test)
 			passed = false
