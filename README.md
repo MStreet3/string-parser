@@ -1,23 +1,33 @@
 ### basic parsing
 
-expose a `Calculate` method that accepts a string of addition / subtraction operations
-and also parentheses to indicate order of operations.
-
-- assumes all string characters are separated by white space
-
-develops a manual `recursive descent parser` to read an expression as a string and return
+implements a manual `recursive descent parser` to read an expression as a string and return
 the value of the expression as an integer.
 
-the `tokenizer` is rather basic and expects that all tokenizable `bytes` are
-separated by white space. the specification is also limited.
+```go
+calculate("1 - 2 + 3") -> 2
+calculate("1 - ( 2 + 3 )") -> 4
+```
+
+the `tokenizer` is basic and expects that all tokenizable elements of the expression are
+separated by white space. any tokenizer, however, that fulfills the `Tokenizer` interface can
+be used.
+
+```go
+type Tokenizer interface {
+	HasMoreTokens() bool
+	GetNextToken() *Token
+}
+```
+
+the token specification used by the parser is limited to four distinct `runes`:
 
 ```go
 /* tokenizer specification */
 var specification = []TokenSpecification{
-	{regex: `^\d+`, name: "NUMBER"},
-	{regex: `^[+\-]`, name: "ADDITIVE_OPERATOR"},
-	{regex: `^\(`, name: "OPEN_PAREN"},
-	{regex: `^\)`, name: "CLOSE_PAREN"},
+	{regex: `^\d+`, name: NUM},
+	{regex: `^[+\-]`, name: ADD_OP},
+	{regex: `^\(`, name: O_PAREN},
+	{regex: `^\)`, name: C_PAREN},
 }
 ```
 
@@ -26,8 +36,7 @@ var specification = []TokenSpecification{
 to execute the tests
 
 ```bash
-$ cd recursiveDescentParser
-$ cd ./src/parser
+$ cd ./recursiveDescentParser/src/parser
 $ go run parser.go
 ```
 
