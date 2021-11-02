@@ -3,12 +3,14 @@ package main
 import (
 	"fmt"
 	"strconv"
-	"strings"
 	"tokenizer"
 )
 
 type Node interface {
 	Evaluate() int
+}
+type Parser interface {
+	Parse(expr string) *ASTree
 }
 
 type GrammarProduction string
@@ -29,35 +31,20 @@ type ASTNode struct {
 	right    *ASTNode
 }
 
-type Parser interface {
-	Parse(expr string) *ASTree
-	BinaryExpression() *ASTNode
-	PrimaryExpression() *ASTNode
-	ParenthesizedExpression() *ASTNode
-	NumericLiteral() *ASTNode
-	eat(tokenType tokenizer.TokenName) *tokenizer.Token
-}
 type BasicParser struct {
-	state     string
-	tokenizer *tokenizer.Tokenizer
+	tokenizer tokenizer.Tokenizer
 	lookAhead *tokenizer.Token
-}
-
-func NewBasicParser() *BasicParser {
-	sp := &BasicParser{
-		state: "",
-	}
-	return sp
 }
 
 /* BasicParser accepts a string and returns the abstract syntax tree
 representation of the string while assuming that all tokenizable bytes
 are separated by a space. */
 func (sp *BasicParser) Parse(p string) *ASTree {
-	sp.state = p
-	sp.tokenizer = &tokenizer.Tokenizer{Stack: strings.Fields(p), Cursor: 0}
+	sp.tokenizer = tokenizer.NewBasicTokenizer(p)
 	sp.lookAhead = sp.tokenizer.GetNextToken()
-	return &ASTree{Root: *sp.BinaryExpression()}
+	return &ASTree{
+		Root: *sp.BinaryExpression(),
+	}
 }
 
 /*
@@ -158,13 +145,21 @@ Calculate accepts a string of addition / subtraction operations
 and also parentheses to indicate order of operations.
 - assumes all string characters are separated by white space
 */
-func Calculate(expr string) int {
-	sp := NewBasicParser()
-	ast := sp.Parse(expr)
-	return ast.Root.Evaluate()
+func makeCalculate(p Parser) func(expr string) int {
+	calculate := func(expr string) int {
+		ast := p.Parse(expr)
+		return ast.Root.Evaluate()
+	}
+	return calculate
 }
 
 func main() {
+
+	/* use a basic parser to calculate the expression values */
+	bp := &BasicParser{}
+	calculate := makeCalculate(bp)
+
+	/* define some test cases */
 	cases := []string{
 		"1 - 2 + 3",
 		"1 - ( 2 + 3 )",
@@ -186,9 +181,10 @@ func main() {
 		6,
 	}
 
+	/* iterate through the test cases */
 	passed := true
 	for i, test := range cases {
-		result := Calculate(test)
+		result := calculate(test)
 		if result != expected[i] {
 			fmt.Printf("failed case %d: %s\n", i, test)
 			passed = false

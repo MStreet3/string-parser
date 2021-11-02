@@ -2,7 +2,13 @@ package tokenizer
 
 import (
 	"regexp"
+	"strings"
 )
+
+type Tokenizer interface {
+	HasMoreTokens() bool
+	GetNextToken() *Token
+}
 
 type TokenName string
 
@@ -26,7 +32,7 @@ var specification = []TokenSpecification{
 	{regex: `^\)`, name: C_PAREN},
 }
 
-type Tokenizer struct {
+type BasicTokenizer struct {
 	Stack  []string
 	Cursor int
 }
@@ -35,13 +41,20 @@ type Token struct {
 	Value string
 }
 
-func (t *Tokenizer) HasMoreTokens() bool {
+func NewBasicTokenizer(expr string) *BasicTokenizer {
+	return &BasicTokenizer{
+		Stack:  strings.Fields(expr),
+		Cursor: 0,
+	}
+}
+
+func (t *BasicTokenizer) HasMoreTokens() bool {
 	return t.Cursor < len(t.Stack)
 }
 
 /* returns token at current cursor or nil advancing cursor
 if token is found. */
-func (t *Tokenizer) GetNextToken() *Token {
+func (t *BasicTokenizer) GetNextToken() *Token {
 	if !t.HasMoreTokens() {
 		return nil
 	}
