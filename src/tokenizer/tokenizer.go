@@ -4,17 +4,26 @@ import (
 	"regexp"
 )
 
+type TokenName string
+
+const (
+	NUM     TokenName = "NUMBER"
+	ADD_OP  TokenName = "ADDITIVE_OPERATOR"
+	O_PAREN TokenName = "OPEN_PAREN"
+	C_PAREN TokenName = "CLOSE_PAREN"
+)
+
 type TokenSpecification struct {
 	regex string
-	name  string
+	name  TokenName
 }
 
 /* tokenizer specification */
 var specification = []TokenSpecification{
-	{regex: `^\d+`, name: "NUMBER"},
-	{regex: `^[+\-]`, name: "ADDITIVE_OPERATOR"},
-	{regex: `^\(`, name: "OPEN_PAREN"},
-	{regex: `^\)`, name: "CLOSE_PAREN"},
+	{regex: `^\d+`, name: NUM},
+	{regex: `^[+\-]`, name: ADD_OP},
+	{regex: `^\(`, name: O_PAREN},
+	{regex: `^\)`, name: C_PAREN},
 }
 
 type Tokenizer struct {
@@ -22,8 +31,8 @@ type Tokenizer struct {
 	Cursor int
 }
 type Token struct {
-	Type  string
-	Value interface{}
+	Type  TokenName
+	Value string
 }
 
 func (t *Tokenizer) HasMoreTokens() bool {
