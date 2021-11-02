@@ -39,6 +39,8 @@ func (t *Tokenizer) HasMoreTokens() bool {
 	return t.Cursor < len(t.Stack)
 }
 
+/* returns token at current cursor or nil advancing cursor
+if token is found. */
 func (t *Tokenizer) GetNextToken() *Token {
 	if !t.HasMoreTokens() {
 		return nil
