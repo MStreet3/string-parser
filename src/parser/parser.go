@@ -21,7 +21,7 @@ const (
 )
 
 type ASTree struct {
-	Root ASTNode
+	Root *ASTNode
 }
 type ASTNode struct {
 	Type     GrammarProduction
@@ -43,7 +43,7 @@ func (sp *BasicParser) Parse(p string) *ASTree {
 	sp.tokenizer = tokenizer.NewBasicTokenizer(p)
 	sp.lookAhead = sp.tokenizer.GetNextToken()
 	return &ASTree{
-		Root: *sp.BinaryExpression(),
+		Root: sp.BinaryExpression(),
 	}
 }
 
