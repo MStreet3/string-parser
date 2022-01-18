@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"strconv"
 	"tokenizer"
 )
@@ -11,6 +10,10 @@ type Node interface {
 }
 type Parser interface {
 	Parse(expr string) *ASTree
+}
+type Calculate func(expr string) int
+type Calculator interface {
+	Calculate(expr string) int
 }
 
 type GrammarProduction string
@@ -145,7 +148,8 @@ Calculate accepts a string of addition / subtraction operations
 and also parentheses to indicate order of operations.
 - assumes all string characters are separated by white space
 */
-func makeCalculate(p Parser) func(expr string) int {
+
+func NewCalculate(p Parser) Calculate {
 	calculate := func(expr string) int {
 		ast := p.Parse(expr)
 		return ast.Root.Evaluate()
@@ -153,46 +157,15 @@ func makeCalculate(p Parser) func(expr string) int {
 	return calculate
 }
 
-func main() {
+type ParsingCalculator struct {
+	parser Parser
+}
 
-	/* use a basic parser to calculate the expression values */
-	bp := &BasicParser{}
-	calculate := makeCalculate(bp)
+func (pc ParsingCalculator) Calculate(expr string) int {
+	ast := pc.parser.Parse(expr)
+	return ast.Root.Evaluate()
+}
 
-	/* define some test cases */
-	cases := []string{
-		"1 - 2 + 3",
-		"1 - ( 2 + 3 )",
-		"1 + 2",
-		"( 1 )",
-		"( 1 - 2 ) + ( 3 + 3 )",
-		"0",
-		"( ( 1 - 5 ) + 4 ) + ( 4 - 1 )",
-		"( ( 1 - 5 ) + ( 4 + ( 3 ) ) ) + ( 4 - ( ( 1 ) ) )",
-	}
-	expected := []int{
-		2,
-		-4,
-		3,
-		1,
-		5,
-		0,
-		3,
-		6,
-	}
-
-	/* iterate through the test cases */
-	passed := true
-	for i, test := range cases {
-		result := calculate(test)
-		if result != expected[i] {
-			fmt.Printf("failed case %d: %s\n", i, test)
-			passed = false
-		}
-
-	}
-	if passed {
-		fmt.Println("all test cases passed!")
-	}
-
+func NewCalculator(p Parser) Calculator {
+	return ParsingCalculator{parser: p}
 }
