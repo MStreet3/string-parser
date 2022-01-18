@@ -4,8 +4,9 @@ implements a manual `recursive descent parser` to read an expression as a string
 the value of the expression as an integer.
 
 ```go
-calculate("1 - 2 + 3") -> 2
-calculate("1 - ( 2 + 3 )") -> 4
+calculator := NewBasicParsingCalculator()
+calculator.Calculate("1 - 2 + 3") -> 2
+calculator.Calculate("1 - ( 2 + 3 )") -> 4
 ```
 
 the `tokenizer` is basic and expects that all tokenizable elements of the expression are
@@ -37,7 +38,7 @@ to execute the tests
 
 ```bash
 $ cd ./recursiveDescentParser/src/parser
-$ go run parser.go
+$ go test -v
 ```
 
 content in this repo is inspired and guided by the [Parser from Scratch](http://dmitrysoshnikov.com/courses/parser-from-scratch/)

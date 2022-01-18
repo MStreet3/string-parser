@@ -8,9 +8,8 @@ import (
 )
 
 func TestExprCalculator(t *testing.T) {
-	/* use a basic parser to calculate the expression values */
-	bp := &BasicParser{}
-	calculator := NewCalculator(bp)
+	/* define a new calculator to evaluate the expressions */
+	calculator := NewBasicParsingCalculator()
 
 	/* define some test cases */
 	cases := []string{

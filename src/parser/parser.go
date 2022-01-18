@@ -169,3 +169,9 @@ func (pc ParsingCalculator) Calculate(expr string) int {
 func NewCalculator(p Parser) Calculator {
 	return ParsingCalculator{parser: p}
 }
+
+func NewBasicParsingCalculator() Calculator {
+	return ParsingCalculator{
+		parser: &BasicParser{},
+	}
+}
