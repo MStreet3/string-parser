@@ -22,6 +22,7 @@ func TestExprCalculator(t *testing.T) {
 		"0",
 		"( ( 1 - 5 ) + 4 ) + ( 4 - 1 )",
 		"( ( 1 - 5 ) + ( 4 + ( 3 ) ) ) + ( 4 - ( ( 1 ) ) )",
+		"( 99 + 1 )",
 	}
 	expected := []int{
 		2,
@@ -33,6 +34,7 @@ func TestExprCalculator(t *testing.T) {
 		0,
 		3,
 		6,
+		100,
 	}
 
 	for i, expression := range cases {
