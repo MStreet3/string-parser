@@ -5,8 +5,8 @@ the value of the expression as an integer.
 
 ```go
 calculator := NewBasicParsingCalculator()
-calculator.Calculate("1 - 2 + 3") -> 2
-calculator.Calculate("1 - ( 2 + 3 )") -> 4
+calculator.Calculate("1 - 2 + 3")      //  2
+calculator.Calculate("1 - ( 2 + 3 )")  // -4
 ```
 
 the `tokenizer` is basic and expects that all tokenizable elements of the expression are
