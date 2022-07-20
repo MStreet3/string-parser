@@ -1,4 +1,4 @@
-package main
+package parser
 
 import (
 	"fmt"
@@ -8,39 +8,58 @@ import (
 )
 
 func TestExprCalculator(t *testing.T) {
-	/* define a new calculator to evaluate the expressions */
-	calculator := NewBasicParsingCalculator()
-
-	/* define some test cases */
-	cases := []string{
-		"1 - 2 + 3",
-		"10 + 5 - ( 5 + 10 )",
-		"1 - ( 2 + 3 )",
-		"1 + 2",
-		"( 1 )",
-		"( 1 - 2 ) + ( 3 + 3 )",
-		"0",
-		"( ( 1 - 5 ) + 4 ) + ( 4 - 1 )",
-		"( ( 1 - 5 ) + ( 4 + ( 3 ) ) ) + ( 4 - ( ( 1 ) ) )",
-		"( 99 + 1 )", // 99 problems
+	tt := []struct {
+		expr string
+		want int
+	}{
+		{
+			expr: "1 - 2 + 3",
+			want: 2,
+		},
+		{
+			expr: "10 + 5 - ( 5 + 10 )",
+			want: 0,
+		},
+		{
+			expr: "1 - ( 2 + 3 )",
+			want: -4,
+		},
+		{
+			expr: "1 + 2",
+			want: 3,
+		},
+		{
+			expr: "( 1 )",
+			want: 1,
+		},
+		{
+			expr: "( 1 - 2 ) + ( 3 + 3 )",
+			want: 5,
+		},
+		{
+			expr: "0",
+			want: 0,
+		},
+		{
+			expr: "( ( 1 - 5 ) + 4 ) + ( 4 - 1 )",
+			want: 3,
+		},
+		{
+			expr: "( ( 1 - 5 ) + ( 4 + ( 3 ) ) ) + ( 4 - ( ( 1 ) ) )",
+			want: 6,
+		},
+		{
+			expr: "( 99 + 1 )", // 99 problems
+			want: 100,
+		},
 	}
-	expected := []int{
-		2,
-		0,
-		-4,
-		3,
-		1,
-		5,
-		0,
-		3,
-		6,
-		100,
-	}
 
-	for i, expression := range cases {
+	calculator := NewBasicCalculator()
+	for i, tc := range tt {
+		tc := tc
 		t.Run(fmt.Sprintf("Case %d", i+1), func(t *testing.T) {
-			result := calculator.Calculate(expression)
-			require.Equal(t, expected[i], result)
+			got := calculator.Calculate(tc.expr)
+			require.Equal(t, tc.want, got)
 		})
 	}
 }

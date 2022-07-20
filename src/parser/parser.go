@@ -1,20 +1,9 @@
-package main
+package parser
 
 import (
 	"strconv"
 	"tokenizer"
 )
-
-type Node interface {
-	Evaluate() int
-}
-type Parser interface {
-	Parse(expr string) *ASTree
-}
-type Calculate func(expr string) int
-type Calculator interface {
-	Calculate(expr string) int
-}
 
 type GrammarProduction string
 
@@ -23,25 +12,14 @@ const (
 	BinaryExpression GrammarProduction = "BINARY_EXPRESSION"
 )
 
-type ASTree struct {
-	Root *ASTNode
-}
-type ASTNode struct {
-	Type     GrammarProduction
-	Value    int
-	Operator string
-	left     *ASTNode
-	right    *ASTNode
-}
-
 type BasicParser struct {
 	tokenizer tokenizer.Tokenizer
 	lookAhead *tokenizer.Token
 }
 
-/* BasicParser accepts a string and returns the abstract syntax tree
-representation of the string while assuming that all tokenizable bytes
-are separated by a space. */
+// BasicParser accepts a string and returns the abstract syntax tree
+// representation of the string while assuming that all tokenizable bytes
+// are separated by a space.
 func (sp *BasicParser) Parse(p string) *ASTree {
 	sp.tokenizer = tokenizer.NewBasicTokenizer(p)
 	sp.lookAhead = sp.tokenizer.GetNextToken()
@@ -50,12 +28,10 @@ func (sp *BasicParser) Parse(p string) *ASTree {
 	}
 }
 
-/*
-BinaryExpression
-	: PrimaryExpression
-	| PrimaryExpression ADDITIVE_OPERATOR PrimaryExpression
-	;
-*/
+// BinaryExpression
+// 	: PrimaryExpression
+//	| PrimaryExpression ADDITIVE_OPERATOR PrimaryExpression
+//	;
 func (sp *BasicParser) BinaryExpression() *ASTNode {
 	left := sp.PrimaryExpression()
 	for sp.lookAhead != nil && sp.lookAhead.Type == tokenizer.ADD_OP {
@@ -71,12 +47,10 @@ func (sp *BasicParser) BinaryExpression() *ASTNode {
 	return left
 }
 
-/*
-PrimaryExpression
-	: NumericLiteral
-	| ParenthesizedExpression
-	;
-*/
+// PrimaryExpression
+// 	: NumericLiteral
+//	| ParenthesizedExpression
+//	;
 func (sp *BasicParser) PrimaryExpression() *ASTNode {
 	switch sp.lookAhead.Type {
 	case tokenizer.O_PAREN:
@@ -86,11 +60,9 @@ func (sp *BasicParser) PrimaryExpression() *ASTNode {
 	}
 }
 
-/*
-ParenthesizedExpression
-	: "(" BinaryExpression ")"
-	;
-*/
+// ParenthesizedExpression
+// 	: "(" BinaryExpression ")"
+//	;
 func (sp *BasicParser) ParenthesizedExpression() *ASTNode {
 	// eat and discard the parentheses, returning the expression
 	sp.eat(tokenizer.O_PAREN)
@@ -99,11 +71,9 @@ func (sp *BasicParser) ParenthesizedExpression() *ASTNode {
 	return expression
 }
 
-/*
-NumericLiteral
-	: NUMBER
-	;
-*/
+// NumericLiteral
+//	: NUMBER
+//	;
 func (sp *BasicParser) NumericLiteral() *ASTNode {
 	token := sp.eat(tokenizer.NUM)
 	if value, err := strconv.Atoi(token.Value); err == nil {
@@ -116,10 +86,8 @@ func (sp *BasicParser) NumericLiteral() *ASTNode {
 
 }
 
-/*
-eat is a helper function that validates the token from the tokenizer
-and steps the parser forward
-*/
+// eat is a helper function that validates the token from the tokenizer
+// and steps the parser forward
 func (sp *BasicParser) eat(tokenType tokenizer.TokenName) *tokenizer.Token {
 	token := sp.lookAhead
 	if token == nil {
@@ -130,48 +98,4 @@ func (sp *BasicParser) eat(tokenType tokenizer.TokenName) *tokenizer.Token {
 	}
 	sp.lookAhead = sp.tokenizer.GetNextToken()
 	return token
-}
-
-/* Evaluate returns the evaluated expression of the AST */
-func (n *ASTNode) Evaluate() int {
-	if n.Type == NumericLiteral {
-		return n.Value
-	} else if n.Operator == "+" {
-		return n.left.Evaluate() + n.right.Evaluate()
-	} else {
-		return n.left.Evaluate() - n.right.Evaluate()
-	}
-}
-
-/*
-Calculate accepts a string of addition / subtraction operations
-and also parentheses to indicate order of operations.
-- assumes all string characters are separated by white space
-*/
-
-func NewCalculate(p Parser) Calculate {
-	calculate := func(expr string) int {
-		ast := p.Parse(expr)
-		return ast.Root.Evaluate()
-	}
-	return calculate
-}
-
-type ParsingCalculator struct {
-	parser Parser
-}
-
-func (pc ParsingCalculator) Calculate(expr string) int {
-	ast := pc.parser.Parse(expr)
-	return ast.Root.Evaluate()
-}
-
-func NewCalculator(p Parser) Calculator {
-	return ParsingCalculator{parser: p}
-}
-
-func NewBasicParsingCalculator() Calculator {
-	return ParsingCalculator{
-		parser: &BasicParser{},
-	}
 }
