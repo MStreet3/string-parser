@@ -2,7 +2,8 @@ package parser
 
 import (
 	"strconv"
-	"tokenizer"
+
+	"github.com/mstreet3/rdp/pkg/tokenizer"
 )
 
 type GrammarProduction string
@@ -12,12 +13,12 @@ const (
 	BinaryExpression GrammarProduction = "BINARY_EXPRESSION"
 )
 
-type Parser interface {
+type Interface interface {
 	Parse(expr string) *ASTree
 }
 
 type BasicParser struct {
-	tokenizer tokenizer.Tokenizer
+	tokenizer tokenizer.Interface
 	lookAhead *tokenizer.Token
 }
 
@@ -31,7 +32,8 @@ func (bp *BasicParser) Parse(p string) *ASTree {
 }
 
 // BinaryExpression
-// 	: PrimaryExpression
+//
+//	: PrimaryExpression
 //	| PrimaryExpression ADDITIVE_OPERATOR PrimaryExpression
 //	;
 func (bp *BasicParser) BinaryExpression() *ASTNode {
@@ -50,7 +52,8 @@ func (bp *BasicParser) BinaryExpression() *ASTNode {
 }
 
 // PrimaryExpression
-// 	: NumericLiteral
+//
+//	: NumericLiteral
 //	| ParenthesizedExpression
 //	;
 func (bp *BasicParser) PrimaryExpression() *ASTNode {
@@ -63,7 +66,8 @@ func (bp *BasicParser) PrimaryExpression() *ASTNode {
 }
 
 // ParenthesizedExpression
-// 	: "(" BinaryExpression ")"
+//
+//	: "(" BinaryExpression ")"
 //	;
 func (bp *BasicParser) ParenthesizedExpression() *ASTNode {
 	// eat and discard the parentheses, returning the expression
@@ -74,6 +78,7 @@ func (bp *BasicParser) ParenthesizedExpression() *ASTNode {
 }
 
 // NumericLiteral
+//
 //	: NUMBER
 //	;
 func (bp *BasicParser) NumericLiteral() *ASTNode {
