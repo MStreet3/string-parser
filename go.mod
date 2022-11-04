@@ -1,4 +1,4 @@
-module github.com/mstreet3/calculator
+module github.com/mstreet3/rdp
 
 go 1.19
 

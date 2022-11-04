@@ -4,12 +4,13 @@ implements a manual `recursive descent parser` to read an expression as a string
 the value of the expression as an integer.
 
 ```go
-calculator := NewBasicParsingCalculator()
+calculator := NewBasicCalculator()
 calculator.Calculate("1 - 2 + 3")      //  2
 calculator.Calculate("1 - ( 2 + 3 )")  // -4
+calculator.Calculate("1 - ( ( 2 + 3 ) + 1 )")  // -5
 ```
 
-the `tokenizer` is basic and expects that all tokenizable elements of the expression are
+The `tokenizer` is basic and expects that all tokenizable elements of the expression are
 separated by white space. any tokenizer, however, that fulfills the `Tokenizer` interface can
 be used.
 
@@ -20,12 +21,11 @@ type Tokenizer interface {
 }
 ```
 
-the token specification used by the parser is limited to four distinct `runes`:
+The token specification used by the parser is limited to four distinct `runes`:
 
 ```go
-/* tokenizer specification */
 var specification = []TokenSpecification{
-	{regex: `^\d+`, name: NUM},
+	{regex: `^(\-)?\d+`, name: NUM},
 	{regex: `^[+\-]`, name: ADD_OP},
 	{regex: `^\(`, name: O_PAREN},
 	{regex: `^\)`, name: C_PAREN},
@@ -34,12 +34,14 @@ var specification = []TokenSpecification{
 
 ### tests
 
-to execute the tests
+To execute the tests
 
 ```bash
-$ cd ./recursiveDescentParser/src/parser
-$ go test -v
+$ cd ./string-parser
+$ go test ./... -v
 ```
 
-content in this repo is inspired and guided by the [Parser from Scratch](http://dmitrysoshnikov.com/courses/parser-from-scratch/)
+### References
+
+Content in this repo is inspired and guided by the [Parser from Scratch](http://dmitrysoshnikov.com/courses/parser-from-scratch/)
 course in JavaScript.
