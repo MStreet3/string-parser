@@ -1,6 +1,6 @@
 package calculator
 
-import "github.com/mstreet3/calculator/pkg/parser"
+import "github.com/mstreet3/rdp/pkg/parser"
 
 type Calculator interface {
 	Calculate(expr string) int

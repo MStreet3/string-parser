@@ -3,7 +3,7 @@ package parser
 import (
 	"strconv"
 
-	"github.com/mstreet3/calculator/pkg/tokenizer"
+	"github.com/mstreet3/rdp/pkg/tokenizer"
 )
 
 type GrammarProduction string
