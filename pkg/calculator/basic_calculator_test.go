@@ -1,4 +1,4 @@
-package parser
+package calculator
 
 import (
 	"fmt"
@@ -33,6 +33,10 @@ func TestBasicCalculator(t *testing.T) {
 			want: 1,
 		},
 		{
+			expr: "( -1 )",
+			want: -1,
+		},
+		{
 			expr: "( 1 - 2 ) + ( 3 + 3 )",
 			want: 5,
 		},
@@ -50,6 +54,10 @@ func TestBasicCalculator(t *testing.T) {
 		},
 		{
 			expr: "( 99 + 1 )", // 99 problems
+			want: 100,
+		},
+		{
+			expr: "( 99 + -1 - -2 )",
 			want: 100,
 		},
 	}

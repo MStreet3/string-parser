@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-type Tokenizer interface {
+type Interface interface {
 	HasMoreTokens() bool
 	GetNextToken() *Token
 }
@@ -24,44 +24,46 @@ type TokenSpecification struct {
 	name  TokenName
 }
 
-/* tokenizer specification */
-var specification = []TokenSpecification{
-	{regex: `^\d+`, name: NUM},
-	{regex: `^[+\-]`, name: ADD_OP},
-	{regex: `^\(`, name: O_PAREN},
-	{regex: `^\)`, name: C_PAREN},
-}
-
-type BasicTokenizer struct {
+type basicTokenizer struct {
 	Stack  []string
 	Cursor int
+	spec   []TokenSpecification
 }
+
 type Token struct {
 	Type  TokenName
 	Value string
 }
 
-func NewBasicTokenizer(expr string) *BasicTokenizer {
-	return &BasicTokenizer{
+func NewBasicTokenizer(expr string) *basicTokenizer {
+	// tokenizer specification
+	var spec = []TokenSpecification{
+		{regex: `^(\-)?\d+`, name: NUM},
+		{regex: `^[+\-]`, name: ADD_OP},
+		{regex: `^\(`, name: O_PAREN},
+		{regex: `^\)`, name: C_PAREN},
+	}
+
+	return &basicTokenizer{
 		Stack:  strings.Fields(expr),
 		Cursor: 0,
+		spec:   spec,
 	}
 }
 
-func (t *BasicTokenizer) HasMoreTokens() bool {
+func (t *basicTokenizer) HasMoreTokens() bool {
 	return t.Cursor < len(t.Stack)
 }
 
-/* returns token at current cursor or nil advancing cursor
-if token is found. */
-func (t *BasicTokenizer) GetNextToken() *Token {
+// GetNextToken returns the token for the current raw value cursor or nil advancing cursor
+// if token is found.
+func (t *basicTokenizer) GetNextToken() *Token {
 	if !t.HasMoreTokens() {
 		return nil
 	}
 	raw := t.Stack[t.Cursor]
-	for _, s := range specification {
-		matched, _ := regexp.MatchString(s.regex, raw)
-		if matched {
+	for _, s := range t.spec {
+		if matched, _ := regexp.MatchString(s.regex, raw); matched {
 			t.Cursor++
 			res := &Token{
 				Type:  s.name,

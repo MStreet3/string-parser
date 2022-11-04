@@ -3,6 +3,7 @@ package parser
 type Node interface {
 	Evaluate() int
 }
+
 type ASTree struct {
 	root Node
 }
