@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/mstreet3/rdp/pkg/ast"
+	"github.com/mstreet3/rdp/pkg/postfix"
 	"github.com/stretchr/testify/require"
 )
 
@@ -62,10 +64,20 @@ func TestBasicCalculator(t *testing.T) {
 		},
 	}
 
-	calculator := NewBasicCalculator()
+	calculator := NewCalculator(&ast.BasicParser{})
 	for i, tc := range tt {
 		tc := tc
 		t.Run(fmt.Sprintf("Case %d", i+1), func(t *testing.T) {
+			got := calculator.Calculate(tc.expr)
+			require.Equal(t, tc.want, got)
+		})
+	}
+
+	// Test the postfix evaluator
+	calculator = NewCalculator(&postfix.BasicParser{})
+	for i, tc := range tt {
+		tc := tc
+		t.Run(fmt.Sprintf("Postfix Case %d", i+1), func(t *testing.T) {
 			got := calculator.Calculate(tc.expr)
 			require.Equal(t, tc.want, got)
 		})
