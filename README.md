@@ -1,7 +1,13 @@
 ### basic parsing
 
-implements a manual `recursive descent parser` to read an expression as a string and return
-the value of the expression as an integer.
+This repo implements a calculator that reads an expression 
+as a string and return the value of the expression as an integer.
+
+Parsing of the string is an implementation detail of the calculator.
+
+String parsing is implemented in two ways:
+ 1. [recursive descent parser](https://en.wikipedia.org/wiki/Recursive_descent_parser) to create an [abstract syntax tree](https://en.wikipedia.org/wiki/Abstract_syntax_tree) for evaluation
+ 2. `infix -> postfix` parser that follows [Djikstra's Shunting Yard algorithm](https://en.wikipedia.org/wiki/Shunting_yard_algorithm) to place expressions in [reverse polish notation](https://en.wikipedia.org/wiki/Reverse_Polish_notation) for evaluation
 
 ```go
 calculator := NewBasicCalculator()
@@ -43,5 +49,5 @@ $ go test ./... -v
 
 ### References
 
-Content in this repo is inspired and guided by the [Parser from Scratch](http://dmitrysoshnikov.com/courses/parser-from-scratch/)
+The recursive descent parser content in this repo is inspired and guided by the [Parser from Scratch](http://dmitrysoshnikov.com/courses/parser-from-scratch/)
 course in JavaScript.
