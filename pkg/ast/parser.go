@@ -1,8 +1,9 @@
-package parser
+package ast
 
 import (
 	"strconv"
 
+	"github.com/mstreet3/rdp/pkg/entities"
 	"github.com/mstreet3/rdp/pkg/tokenizer"
 )
 
@@ -13,10 +14,6 @@ const (
 	BinaryExpression GrammarProduction = "BINARY_EXPRESSION"
 )
 
-type Interface interface {
-	Parse(expr string) *ASTree
-}
-
 type BasicParser struct {
 	tokenizer tokenizer.Interface
 	lookAhead *tokenizer.Token
@@ -25,10 +22,10 @@ type BasicParser struct {
 // BasicParser accepts a string and returns the abstract syntax tree
 // representation of the string while assuming that all tokenizable bytes
 // are separated by a space.
-func (bp *BasicParser) Parse(p string) *ASTree {
+func (bp *BasicParser) Parse(p string) (entities.Evaluator, error) {
 	bp.tokenizer = tokenizer.NewBasicTokenizer(p)
 	bp.lookAhead = bp.tokenizer.GetNextToken()
-	return NewASTree(bp.BinaryExpression())
+	return NewASTree(bp.BinaryExpression()), nil
 }
 
 // BinaryExpression
